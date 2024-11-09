@@ -1,3 +1,5 @@
+![Banner Image](docs/banner.webp)
+
 # Description
 
 Sample Api for creating PDF invoices and quotes. Made with Express and TypeScript.
