@@ -8,6 +8,7 @@ interface QuoteRequest {
   customerName: string;
   customerAddress: string;
   customerPhone: string;
+  customerFax: string;
   customerEmail: string;
   orderNumber: string;
   orderDate: string;
@@ -127,7 +128,7 @@ export async function createPdfController(req: any, res: any) {
     font,
   });
 
-  page.drawText(`${body.customerPhone}`, {
+  page.drawText(`${body.customerFax}`, {
     x: 130,
     y: height - 200,
     size: 12,
