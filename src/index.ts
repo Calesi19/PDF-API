@@ -1,4 +1,4 @@
-import { createPdfController } from "./controllers/createPdf";
+import { createPdfController } from "./controllers/createPdfController";
 import healthCheckController from "./controllers/healthCheckController";
 
 const express = require("express");
