@@ -23,43 +23,206 @@ interface QuoteRequest {
 }
 
 export async function createPdfController(req: any, res: any) {
-  const body = req.body as QuoteRequest; // Type assertion for cleaner code
+  const body = req.body as QuoteRequest;
 
-  // Create a new PDF document
   const pdfDoc = await PDFDocument.create();
-  const page = pdfDoc.addPage([595, 842]); // A4 size
+  const page = pdfDoc.addPage([595, 842]);
   const { width, height } = page.getSize();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
 
-  // Draw Distributor and Retailer Info
-  page.drawText(`Distributor: ${body.distributorName}`, {
+  const wrapText = (text: string, maxWidth: number, fontSize: number) => {
+    const lines = [];
+    let currentLine = "";
+
+    for (const word of text.split(" ")) {
+      const testLine = currentLine ? `${currentLine} ${word}` : word;
+      const lineWidth = font.widthOfTextAtSize(testLine, fontSize);
+
+      if (lineWidth > maxWidth) {
+        lines.push(currentLine);
+        currentLine = word;
+      } else {
+        currentLine = testLine;
+      }
+    }
+    if (currentLine) lines.push(currentLine);
+    return lines;
+  };
+
+  page.drawRectangle({
+    x: 40,
+    y: height - 250,
+    width: 250,
+    height: 150,
+    borderColor: rgb(0, 0, 0), // Black
+    borderWidth: 1,
+  });
+
+  page.drawRectangle({
+    x: 45,
+    y: height - 105,
+    width: 115,
+    height: 10,
+    color: rgb(1, 1, 1), // Black
+  });
+
+  page.drawText(`Vendor Information:`, {
     x: 50,
+    y: height - 105,
+    size: 12,
+    font,
+  });
+  page.drawText(`Name:`, {
+    x: 50,
+    y: height - 125,
+    size: 12,
+    font,
+  });
+
+  page.drawText(`${body.distributorName}`, {
+    x: 130,
+    y: height - 125,
+    size: 12,
+    font,
+  });
+
+  page.drawText(`Address:`, {
+    x: 50,
+    y: height - 140,
+    size: 12,
+    font,
+  });
+
+  page.drawText(`${body.retailerName}`, {
+    x: 130,
+    y: height - 140,
+    size: 12,
+    font,
+  });
+
+  page.drawText(`Phone:`, {
+    x: 50,
+    y: height - 185,
+    size: 12,
+    font,
+  });
+
+  page.drawText(`${body.retailerName}`, {
+    x: 130,
+    y: height - 185,
+    size: 12,
+    font,
+  });
+
+  page.drawText(`Fax:`, {
+    x: 50,
+    y: height - 200,
+    size: 12,
+    font,
+  });
+  page.drawText(`${body.customerPhone}`, {
+    x: 130,
+    y: height - 200,
+    size: 12,
+    font,
+  });
+
+  page.drawText(`Email:`, {
+    x: 50,
+    y: height - 215,
+    size: 12,
+    font,
+  });
+
+  page.drawText(`${body.customerEmail}`, {
+    x: 130,
+    y: height - 215,
+    size: 12,
+    font,
+  });
+
+  page.drawRectangle({
+    x: 40,
+    y: height - 800,
+    width: 520,
+    height: 25,
+    borderColor: rgb(0, 0, 0), // Black
+    borderWidth: 1,
+  });
+
+  page.drawText(`Order Total:`, {
+    x: 420,
+    y: height - 793,
+    size: 12,
+    font,
+  });
+
+  page.drawText(`$${body.total}`, {
+    x: 490,
+    y: height - 793,
+    size: 12,
+    font,
+  });
+
+  page.drawText(`Order`, {
+    x: 500,
     y: height - 50,
     size: 12,
     font,
   });
-  page.drawText(`Retailer: ${body.retailerName}`, {
-    x: 50,
-    y: height - 70,
+  page.drawText(`#${body.orderNumber}`, {
+    x: 400,
+    y: height - 50,
     size: 12,
     font,
   });
 
-  // Add Distributor Logo
+  page.drawText(`${body.orderDate}`, {
+    x: 400,
+    y: height - 65,
+    size: 12,
+    font,
+  });
+
+  page.drawText(`Page 1 of 1`, {
+    x: 500,
+    y: height - 65,
+    size: 12,
+    font,
+  });
+
   if (body.distributorLogoUrl) {
     const logoBytes = await fetch(body.distributorLogoUrl).then((res) =>
       res.arrayBuffer(),
     );
     const logoImage = await pdfDoc.embedPng(logoBytes);
+
+    // Original dimensions of the image
+    const originalWidth = logoImage.width;
+    const originalHeight = logoImage.height;
+
+    // Target dimensions
+    const targetWidth = 100;
+    const targetHeight = 50;
+
+    // Calculate the scaling factor to maintain aspect ratio
+    const widthScale = targetWidth / originalWidth;
+    const heightScale = targetHeight / originalHeight;
+    const scale = Math.min(widthScale, heightScale);
+
+    // Apply scaling to maintain aspect ratio
+    const displayWidth = originalWidth * scale;
+    const displayHeight = originalHeight * scale;
+
+    // Draw the image with scaled dimensions
     page.drawImage(logoImage, {
-      x: 400,
+      x: 50,
       y: height - 80,
-      width: 100,
-      height: 50,
+      width: displayWidth,
+      height: displayHeight,
     });
   }
 
-  // Add Retailer Logo
   if (body.retailerLogoUrl) {
     const retailerLogoBytes = await fetch(body.retailerLogoUrl).then((res) =>
       res.arrayBuffer(),
@@ -73,88 +236,38 @@ export async function createPdfController(req: any, res: any) {
     });
   }
 
-  // Draw Customer Info
-  page.drawText(`Customer: ${body.customerName}`, {
-    x: 50,
-    y: height - 110,
-    size: 12,
-    font,
-  });
-  page.drawText(`Address: ${body.customerAddress}`, {
-    x: 50,
-    y: height - 130,
-    size: 12,
-    font,
-  });
-  page.drawText(`Phone: ${body.customerPhone}`, {
-    x: 50,
-    y: height - 150,
-    size: 12,
-    font,
-  });
-  page.drawText(`Email: ${body.customerEmail}`, {
-    x: 50,
-    y: height - 170,
-    size: 12,
-    font,
-  });
-
-  // Draw Order Info
-  page.drawText(`Order Number: ${body.orderNumber}`, {
-    x: 50,
-    y: height - 200,
-    size: 12,
-    font,
-  });
-  page.drawText(`Order Date: ${body.orderDate}`, {
-    x: 50,
-    y: height - 220,
-    size: 12,
-    font,
-  });
-
-  // Draw Table Headers
   let yPos = height - 260;
   page.drawText("Product", { x: 50, y: yPos, size: 10, font });
   page.drawText("Quantity", { x: 200, y: yPos, size: 10, font });
   page.drawText("Price", { x: 300, y: yPos, size: 10, font });
   yPos -= 20;
 
-  // Draw Order Items
-  body.orderItems.forEach((item) => {
-    page.drawText(item.name, { x: 50, y: yPos, size: 10, font });
-    page.drawText(String(item.quantity), { x: 200, y: yPos, size: 10, font });
-    page.drawText(`$${item.price}`, { x: 300, y: yPos, size: 10, font });
-    yPos -= 20;
+  const maxWidth = 140; // Maximum width for the item name column
+  const fontSize = 10;
+
+  body.orderItems.forEach((item, index) => {
+    const itemNameLines = wrapText(item.name, maxWidth, fontSize);
+
+    itemNameLines.forEach((line, lineIndex) => {
+      page.drawText(line, {
+        x: 50,
+        y: yPos - lineIndex * 12,
+        size: fontSize,
+        font,
+      });
+    });
+
+    page.drawText(String(item.quantity), {
+      x: 200,
+      y: yPos,
+      size: fontSize,
+      font,
+    });
+    page.drawText(`$${item.price}`, { x: 300, y: yPos, size: fontSize, font });
+
+    yPos -= 20 * itemNameLines.length;
   });
 
-  // Draw Summary Section
-  yPos -= 20;
-  page.drawText(`Subtotal: $${body.subTotal}`, {
-    x: 50,
-    y: yPos,
-    size: 12,
-    font,
-  });
-  yPos -= 20;
-  page.drawText(`Tax: $${body.tax}`, { x: 50, y: yPos, size: 12, font });
-  yPos -= 20;
-  page.drawText(`Shipping: $${body.shipping}`, {
-    x: 50,
-    y: yPos,
-    size: 12,
-    font,
-  });
-  yPos -= 20;
-  page.drawText(`Total: $${body.total}`, {
-    x: 50,
-    y: yPos,
-    size: 12,
-    font,
-    color: rgb(0, 0.5, 0),
-  });
-
-  // Finalize the PDF and send it as a byte array
   const pdfBytes = await pdfDoc.save();
   res.setHeader("Content-Type", "application/pdf");
   res.send(Buffer.from(pdfBytes));
