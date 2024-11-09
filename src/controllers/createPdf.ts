@@ -49,6 +49,7 @@ export async function createPdfController(req: any, res: any) {
     return lines;
   };
 
+  // Vendor Information Box
   page.drawRectangle({
     x: 40,
     y: height - 250,
@@ -72,6 +73,8 @@ export async function createPdfController(req: any, res: any) {
     size: 12,
     font,
   });
+
+  // Write Name
   page.drawText(`Name:`, {
     x: 50,
     y: height - 125,
@@ -86,6 +89,7 @@ export async function createPdfController(req: any, res: any) {
     font,
   });
 
+  // Write Address
   page.drawText(`Address:`, {
     x: 50,
     y: height - 140,
@@ -93,13 +97,14 @@ export async function createPdfController(req: any, res: any) {
     font,
   });
 
-  page.drawText(`${body.retailerName}`, {
+  page.drawText(`${body.customerAddress}`, {
     x: 130,
     y: height - 140,
     size: 12,
     font,
   });
 
+  // Write Phone
   page.drawText(`Phone:`, {
     x: 50,
     y: height - 185,
@@ -107,19 +112,21 @@ export async function createPdfController(req: any, res: any) {
     font,
   });
 
-  page.drawText(`${body.retailerName}`, {
+  page.drawText(`${body.customerPhone}`, {
     x: 130,
     y: height - 185,
     size: 12,
     font,
   });
 
+  // Write Fax
   page.drawText(`Fax:`, {
     x: 50,
     y: height - 200,
     size: 12,
     font,
   });
+
   page.drawText(`${body.customerPhone}`, {
     x: 130,
     y: height - 200,
@@ -141,6 +148,7 @@ export async function createPdfController(req: any, res: any) {
     font,
   });
 
+  // Footer
   page.drawRectangle({
     x: 40,
     y: height - 800,
@@ -164,12 +172,17 @@ export async function createPdfController(req: any, res: any) {
     font,
   });
 
+  // Header
+
+  // Specify Document Title
   page.drawText(`Order`, {
     x: 500,
     y: height - 50,
     size: 12,
     font,
   });
+
+  // Write Order Number
   page.drawText(`#${body.orderNumber}`, {
     x: 400,
     y: height - 50,
@@ -177,6 +190,7 @@ export async function createPdfController(req: any, res: any) {
     font,
   });
 
+  // Write Order Date
   page.drawText(`${body.orderDate}`, {
     x: 400,
     y: height - 65,
@@ -184,6 +198,7 @@ export async function createPdfController(req: any, res: any) {
     font,
   });
 
+  // Write Page Number
   page.drawText(`Page 1 of 1`, {
     x: 500,
     y: height - 65,
@@ -191,6 +206,7 @@ export async function createPdfController(req: any, res: any) {
     font,
   });
 
+  // Draw the distributor logo
   if (body.distributorLogoUrl) {
     const logoBytes = await fetch(body.distributorLogoUrl).then((res) =>
       res.arrayBuffer(),
