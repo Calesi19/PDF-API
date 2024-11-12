@@ -15,7 +15,7 @@ async function start() {
 
     // Routes
     app.get("/", healthCheckController);
-    app.post("/create-pdf", createPdfController);
+    app.post("/order/pdf", createPdfController);
 
     // Start server
     app.listen(3000, () => {

@@ -12,15 +12,12 @@ interface QuoteRequest {
   customerEmail: string;
   orderNumber: string;
   orderDate: string;
+  total: string;
   orderItems: Array<{
     name: string;
     quantity: string;
     price: string;
   }>;
-  subTotal: string;
-  tax: string;
-  shipping: string;
-  total: string;
 }
 
 export async function createPdfController(req: any, res: any) {
@@ -241,25 +238,33 @@ export async function createPdfController(req: any, res: any) {
   }
 
   if (body.retailerLogoUrl) {
-    const retailerLogoBytes = await fetch(body.retailerLogoUrl).then((res) =>
+    const logoBytes = await fetch(body.retailerLogoUrl).then((res) =>
       res.arrayBuffer(),
     );
-    const retailerLogoImage = await pdfDoc.embedPng(retailerLogoBytes);
+    const retailerLogoImage = await pdfDoc.embedPng(logoBytes);
     page.drawImage(retailerLogoImage, {
       x: 400,
-      y: height - 140,
+      y: height - 270,
       width: 100,
-      height: 50,
+      height: 180,
     });
   }
 
-  let yPos = height - 260;
+  page.drawRectangle({
+    x: 40,
+    y: height - 306,
+    width: 520,
+    height: 20,
+    color: rgb(0.9, 0.9, 0.9),
+  });
+
+  let yPos = height - 300;
   page.drawText("Product", { x: 50, y: yPos, size: 10, font });
-  page.drawText("Quantity", { x: 200, y: yPos, size: 10, font });
-  page.drawText("Price", { x: 300, y: yPos, size: 10, font });
+  page.drawText("Quantity", { x: 400, y: yPos, size: 10, font });
+  page.drawText("Price", { x: 500, y: yPos, size: 10, font });
   yPos -= 20;
 
-  const maxWidth = 140; // Maximum width for the item name column
+  const maxWidth = 240; // Maximum width for the item name column
   const fontSize = 10;
 
   body.orderItems.forEach((item, index) => {
@@ -275,15 +280,34 @@ export async function createPdfController(req: any, res: any) {
     });
 
     page.drawText(String(item.quantity), {
-      x: 200,
+      x: 400,
       y: yPos,
       size: fontSize,
       font,
     });
-    page.drawText(`$${item.price}`, { x: 300, y: yPos, size: fontSize, font });
+    page.drawText(`$${item.price}`, { x: 500, y: yPos, size: fontSize, font });
 
-    yPos -= 20 * itemNameLines.length;
+    page.drawRectangle({
+      x: 40,
+      y: yPos + fontSize + 3,
+      width: 520,
+      height: 1,
+      color: rgb(0.9, 0.9, 0.9),
+    });
+
+    yPos -= fontSize + 12 * itemNameLines.length;
   });
+
+  page.drawRectangle({
+    x: 40,
+    y: yPos - 6,
+    width: 520,
+    height: 20,
+    color: rgb(0.9, 0.9, 0.9),
+  });
+
+  page.drawText("Total:", { x: 400, y: yPos, size: 10, font });
+  page.drawText("$3443.43", { x: 500, y: yPos, size: 10, font });
 
   const pdfBytes = await pdfDoc.save();
   res.setHeader("Content-Type", "application/pdf");
