@@ -300,7 +300,7 @@ export async function createPdfController(req: any, res: any) {
 
   page.drawRectangle({
     x: 40,
-    y: yPos - 6,
+    y: yPos - 5,
     width: 520,
     height: 20,
     color: rgb(0.9, 0.9, 0.9),
