@@ -1,6 +1,6 @@
 import { PDFDocument, StandardFonts, rgb } from "pdf-lib";
 
-interface QuoteRequest {
+interface CondensedQuoteRequest {
   distributorName: string;
   distributorLogoUrl: string;
   retailerName: string;
@@ -12,15 +12,19 @@ interface QuoteRequest {
   customerEmail: string;
   orderNumber: string;
   orderDate: string;
-  total: string;
+  total: number;
   orderItems: Array<{
-    name: string;
-    quantity: string;
-    price: string;
+    price: number;
+    description: string;
+    components: Array<{
+      name: string;
+      quantity: string;
+      price: number;
+    }>;
   }>;
 }
 
-export async function createPdfCondensed(body: QuoteRequest): Promise<Uint8Array> {
+export async function createPdfCondensed(body: CondensedQuoteRequest): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
   const page = pdfDoc.addPage([595, 842]);
   const { width, height } = page.getSize();
@@ -266,7 +270,7 @@ export async function createPdfCondensed(body: QuoteRequest): Promise<Uint8Array
   const fontSize = 10;
 
   body.orderItems.forEach((item, index) => {
-    const itemNameLines = wrapText(item.name, maxWidth, fontSize);
+    const itemNameLines = wrapText(item.components[0].name, maxWidth, fontSize);
 
     itemNameLines.forEach((line, lineIndex) => {
       page.drawText(line, {
@@ -277,7 +281,7 @@ export async function createPdfCondensed(body: QuoteRequest): Promise<Uint8Array
       });
     });
 
-    page.drawText(String(item.quantity), {
+    page.drawText(String(item.components[0].quantity), {
       x: 400,
       y: yPos,
       size: fontSize,
