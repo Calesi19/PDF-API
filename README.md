@@ -6,7 +6,7 @@ Sample Api for creating PDF invoices and quotes. Made with Express and TypeScrip
 
 # Requirements
 
-- Node.js
+- node.js
 - npm
 
 There aren't many libraries that can create PDFs for free and don't need some kind of browser component or kit to work.
