@@ -21,6 +21,11 @@ interface QuoteRequest {
   }>;
 }
 
+export async function healthCheckController(req: any, res: any) {
+  res.send("OK");
+}
+
+
 export async function createPdfController(req: any, res: any) {
 
   // If parameter 'isCondensed' is true, use the condensed version of the PDF
