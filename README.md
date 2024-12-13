@@ -14,6 +14,14 @@ This project uses "pdf-lib" which is written purely in JavaScript, so it doesn't
 
 [PDF-LIB Documentation](https://pdf-lib.js.org/)
 
+# Deploy with Docker
+
+1. Run the following command
+
+```bash
+ docker run -p 3000:3000 calesi19/pdf-api:latest
+```
+
 # Usage
 
 1. Clone the repository
