@@ -25,7 +25,6 @@ export async function healthCheckController(req: any, res: any) {
   res.send("OK");
 }
 
-
 export async function createPdfController(req: any, res: any) {
 
   // If parameter 'isCondensed' is true, use the condensed version of the PDF
@@ -35,7 +34,8 @@ export async function createPdfController(req: any, res: any) {
   const pdfDetails = req.body as QuoteRequest;
 
   // Create the PDF
-  const pdfBytes = isCondensed ? await createPdfCondensed(pdfDetails) : await createPdf(pdfDetails);
+  // const pdfBytes = isCondensed ? await createPdfCondensed(pdfDetails) : await createPdf(pdfDetails);
+  const pdfBytes = await createPdf(pdfDetails);
 
   // Send the PDF as a response
   res.setHeader("Content-Type", "application/pdf");

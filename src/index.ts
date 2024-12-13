@@ -18,7 +18,7 @@ async function start() {
     app.post("/order/pdf", createPdfController);
 
     // Start server
-    app.listen(3001, () => {
+    app.listen(3000, () => {
       console.log("Server is running on port 3000");
     });
   } catch (error) {
