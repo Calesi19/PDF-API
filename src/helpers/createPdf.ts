@@ -25,6 +25,7 @@ export async function createPdf(body: QuoteRequest): Promise<Uint8Array> {
   const page = pdfDoc.addPage([595, 842]);
   const { width, height } = page.getSize();
   const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const boldFont = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
   const wrapText = (text: string, maxWidth: number, fontSize: number) => {
     const lines = [];
@@ -158,14 +159,16 @@ export async function createPdf(body: QuoteRequest): Promise<Uint8Array> {
     x: 420,
     y: height - 793,
     size: 12,
-    font,
+    font:
+      boldFont,
   });
 
   page.drawText(`$${body.total}`, {
     x: 490,
     y: height - 793,
     size: 12,
-    font,
+    font:
+      boldFont,
   });
 
   // Header
@@ -257,7 +260,7 @@ export async function createPdf(body: QuoteRequest): Promise<Uint8Array> {
   });
 
   let yPos = height - 300;
-  page.drawText("Product", { x: 50, y: yPos, size: 10, font });
+  page.drawText("Item Description", { x: 50, y: yPos, size: 10, font });
   page.drawText("Quantity", { x: 400, y: yPos, size: 10, font });
   page.drawText("Price", { x: 500, y: yPos, size: 10, font });
   yPos -= 20;
@@ -301,11 +304,13 @@ export async function createPdf(body: QuoteRequest): Promise<Uint8Array> {
     y: yPos - 5,
     width: 520,
     height: 20,
-    color: rgb(0.9, 0.9, 0.9),
+    color:
+      rgb(246 / 255, 243 / 255, 226 / 255),
   });
 
-  page.drawText("Total:", { x: 400, y: yPos, size: 10, font });
-  page.drawText("$3443.43", { x: 500, y: yPos, size: 10, font });
+
+  page.drawText("Total:", { x: 400, y: yPos, size: 10, font: boldFont });
+  page.drawText("$3443.43", { x: 500, y: yPos, size: 10, font: boldFont });
 
   const pdfBytes = await pdfDoc.save();
 
